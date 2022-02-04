@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# script-name
+# ####################
+# one liner description
+# script-template [ARGS]
+# 
+# full description (if needed)
+#
+# options
+# ####################
+# h - Print help text.
+# l - Print license.
+# v - Print software version and exit.
+
+##########################
+# variables 		 #
+##########################
+
+version="0.0.1"
+
+var=""
+
+##########################
+# functions 		 #
+##########################
+
+# FunctionName()
+# {
+	# one liner description
+
+	# <insert code block here>
+	# ^- describe code block if needed
+# }
+
+Help()
+{
+	# Print help text.
+	echo "Add description of the script functions here."
+	echo
+   	echo "Syntax: scriptTemplate [-g|h|v|V]"
+   	echo "options:"
+	echo "h - Print help text."
+	echo "l - Print license."
+	echo "v - Print software version and ext."
+   	echo
+}
+
+##########################
+# program 		 #
+##########################	
+
+while getopts "hldv" option; do
+	case $option in
+		h) # Print help text.
+			Help
+			exit;;
+		l) # Print LICENSE.
+			cat LICENSE
+			exit;;
+		d) # Enable debug mode.
+			set -o errexit
+			set -o pipefail
+			set -o nounset
+			;;
+		v) # Print software version and exit.
+			echo "Version: $version"
+			exit;;
+		\?) # Invalid opt
+			echo "Error: Invalid option."
+			exit;;
+	esac
+done
+
