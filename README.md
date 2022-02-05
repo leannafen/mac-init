@@ -2,7 +2,7 @@
 # mac-init
 # ####################
 # initialization script for macOS
-# mac-init [fhlv] [program-list-folder]
+# mac-init [fhlv] [list-directory]
 # 
 # I used Mike McQuaid's strap but constantly had
 # issues with it (it not using my Brewfile, 
@@ -12,8 +12,18 @@
 #
 # options
 # ####################
-# f - Point script to folder containing program lists.
+# f - Directory to read lists from..
+# 	if omitted, script will look for lists in
+# 	~/.config/mac-init/programs/
 # h - Print help text.
 # l - Print license.
 # v - Print software version and exit.
+#
+# todo
+# ####################
+# * Neovim setup functions
+# 	* need a find a way to run neovim headless
+# * automated git config
+# * initialize function (creates files & folders for you)
+# * pull from gh repo?
 ```
