@@ -177,7 +177,7 @@ NeovimTs()
 while getopts "f:hldv" option; do
 	case $option in
 		f) # Set list directory.
-			ListDir=${OPTARG}
+			listdir=${OPTARG}
 			;;
 		h) # Print help text.
 			Help
