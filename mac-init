@@ -1,0 +1,213 @@
+#!/bin/bash
+
+# mac-init
+# ####################
+# initialization script for macOS
+# mac-init [fhlv] [list-directory]
+# 
+# I used Mike McQuaid's strap but constantly had
+# issues with it (it not using my Brewfile, 
+# git not being configured automatically, etc.)
+# so I just made my own script. It's still missing
+# quite a few things, but that comes later.
+#
+# options
+# ####################
+# f - Directory to read lists from..
+# 	if omitted, script will look for lists in
+# 	~/.config/mac-init/programs/
+# h - Print help text.
+# l - Print license.
+# v - Print software version and exit.
+#
+# todo
+# ####################
+# * Neovim setup functions
+# 	* need a find a way to run neovim headless
+# * automated git config
+# * initialize function (creates files & folders for you)
+# * pull from gh repo?
+
+##########################
+# variables 		 #
+##########################
+
+version="0.1.0"
+
+listdir="$HOME/.config/mac-init/programs"
+
+##########################
+# functions 		 #
+##########################
+
+Help()
+{
+	# Print help text.
+	echo "initialization script for macOS"
+	echo
+   	echo "Syntax: mac-init [fhlv]"
+   	echo "options:"
+	echo "f - Directory to read lists from."
+	echo "	if omitted, script will look for lists in"
+	echo "	~/.config/mac-init/programs"
+	echo "h - Print help text."
+	echo "l - Print license."
+	echo "v - Print software version and ext."
+   	echo
+}
+
+##########################
+
+BrewInit()
+{
+	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+	echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> /Users/$USER/.zprofile
+	eval $(/opt/homebrew/bin/brew shellenv)
+}
+
+BrewInstall()
+{
+	for TAP in $(cat "$listdir"/tap)
+	do
+		echo "brew: tapping $TAP"
+		brew tap -q "$TAP" > /dev/null 2>&1
+	done
+
+	for FORMULA in $(cat "$listdir"/brew)
+	do
+		echo "brew: installing formula $FORMULA"
+		brew install -q "$FORMULA" > /dev/null/ 2>&1
+	done
+
+	for CASK in $(cat "$listdir"/cask)
+	do
+		echo "brew: installing cask $CASK"
+		brew install -q --cask "$CASK" > /dev/null/ 2>&1
+	done
+}
+
+DmgPkg()
+{
+	for LINK in $(cat "$listdir"/dmgpkg)
+	do
+    		tmpd=$(mktemp -d)
+
+		wget $LINK -P $tmpd
+
+    		if [ -e "$tmpd"/*.zip ]; then
+        		name=$(basename $(find $tmpd/*.zip))
+
+        		echo "unzipping $name"
+        		unzip "$tmpd"/*.zip -d "$tmpd" > /dev/null/ 2>&1
+    		fi
+
+		if [ -e "$tmpd"/*.dmg ]; then
+			name=$(basename $(find $tmpd/*.dmg)) 
+
+        		echo "mounting $name"
+        		hdiutil attach -quiet "$tmpd"/"$name" > /dev/null/ 2>&1
+			disk=$(ls /Volumes | fzf -f \!mac)
+
+        		echo "copying application from /Volumes/$disk to Applications"
+        		sudo cp -rf /Volumes/$disk/*.app /Applications > /dev/null/ 2>&1
+
+        		echo "unmounting /Volumes/$disk"
+        		hdiutil unmount -quiet /Volumes/"$disk" > /dev/null/ 2>&1
+    		elif [ -e "$tmpd"/*.pkg ]; then
+        		name=$(basename $(find $tmpd/*.pkg))
+
+        		echo "installing $name"
+        		sudo installer -pkg "$tmpd"/"$name" -target / > /dev/null/ 2>&1
+    		else
+        		echo "unknown file type. copying to ~/Scripts/dskpkg/tmp/"
+        		sudo cp -rf "$tmpd" "~/Scripts/dskpkg/tmp/" > /dev/null/ 2>&1
+    		fi    
+
+    		rm -rf $tmpd
+	done
+}
+
+GitInit()
+{
+	echo "not implemented yet."
+}
+
+MasInstall()
+{
+	for APPID in $(cat "$listdir"/mas)
+	do
+		echo "mas: installing app #$APPID"
+		mas install "$APPID" > /dev/null 2>&1
+	done
+}
+
+NeovimInit()
+{
+	# install packer
+	echo "neovim: installing Packer."
+	git clone --depth 1 https://github.com/wbthomason/packer.nvim\ 
+	~/.local/share/nvim/site/pack/packer/start/packer.nvim 
+
+	# TODO
+	# run :PackerSync and :PackerInstall
+
+	echo "not fully implemented yet."
+}
+
+NeovimLsp()
+{
+	# TODO
+	# run :LspInstall <insert-server-here>
+
+	echo "not implemented yet."
+}
+
+NeovimTs()
+{
+	# TODO
+	# run :TSInstall <insert-treesitter-here>
+
+	echo "not implemented yet."
+}
+
+##########################
+# program 		 #
+##########################	
+
+while getopts "f:hldv" option; do
+	case $option in
+		f) # Set list directory.
+			ListDir=${OPTARG}
+			;;
+		h) # Print help text.
+			Help
+			exit;;
+		l) # Print LICENSE.
+			cat LICENSE
+			exit;;
+		d) # Enable debug mode.
+			set -o errexit
+			set -o pipefail
+			set -o nounset
+			;;
+		v) # Print software version and exit.
+			echo "Version: $version"
+			exit;;
+		\?) # Invalid opt
+			echo "Error: Invalid option."
+			Help
+			exit;;
+	esac
+done
+
+GitInit
+BrewInit
+BrewInstall
+MasInstall
+DmgPkg
+NeovimInit
+NeovimLsp
+NeovimTs
+
+# run mac-post script
+./mac-post
