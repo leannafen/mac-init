@@ -3,6 +3,8 @@
 # ####################
 # initialization script for macOS
 # mac-init [fhlv] [list-directory]
+# curl https://raw.githubusercontent.com/leannafen/mac-init/main/mac-init | \
+# bash -s -- [fhlv] [list-directory]
 # 
 # I used Mike McQuaid's strap but constantly had
 # issues with it (it not using my Brewfile, 
