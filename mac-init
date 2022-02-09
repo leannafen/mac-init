@@ -62,7 +62,7 @@ Help()
 
 BrewInit()
 {
-	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 	echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> /Users/$USER/.zprofile
 	eval $(/opt/homebrew/bin/brew shellenv)
 }
@@ -78,13 +78,13 @@ BrewInstall()
 	for FORMULA in $(cat "$listdir"/brew)
 	do
 		echo "brew: installing formula $FORMULA"
-		brew install -q "$FORMULA" > /dev/null/ 2>&1
+		brew install -q "$FORMULA" > /dev/null 2>&1
 	done
 
 	for CASK in $(cat "$listdir"/cask)
 	do
 		echo "brew: installing cask $CASK"
-		brew install -q --cask "$CASK" > /dev/null/ 2>&1
+		brew install -q --cask "$CASK" > /dev/null 2>&1
 	done
 }
 
@@ -100,29 +100,29 @@ DmgPkg()
         		name=$(basename $(find $tmpd/*.zip))
 
         		echo "unzipping $name"
-        		unzip "$tmpd"/*.zip -d "$tmpd" > /dev/null/ 2>&1
+        		unzip "$tmpd"/*.zip -d "$tmpd" > /dev/null 2>&1
     		fi
 
 		if [ -e "$tmpd"/*.dmg ]; then
 			name=$(basename $(find $tmpd/*.dmg)) 
 
         		echo "mounting $name"
-        		hdiutil attach -quiet "$tmpd"/"$name" > /dev/null/ 2>&1
+        		hdiutil attach -quiet "$tmpd"/"$name" > /dev/null 2>&1
 			disk=$(ls /Volumes | fzf -f \!mac)
 
         		echo "copying application from /Volumes/$disk to Applications"
-        		sudo cp -rf /Volumes/$disk/*.app /Applications > /dev/null/ 2>&1
+        		sudo cp -rf /Volumes/$disk/*.app /Applications > /dev/null 2>&1
 
         		echo "unmounting /Volumes/$disk"
-        		hdiutil unmount -quiet /Volumes/"$disk" > /dev/null/ 2>&1
+        		hdiutil unmount -quiet /Volumes/"$disk" > /dev/null 2>&1
     		elif [ -e "$tmpd"/*.pkg ]; then
         		name=$(basename $(find $tmpd/*.pkg))
 
         		echo "installing $name"
-        		sudo installer -pkg "$tmpd"/"$name" -target / > /dev/null/ 2>&1
+        		sudo installer -pkg "$tmpd"/"$name" -target / > /dev/null 2>&1
     		else
         		echo "unknown file type. copying to ~/Scripts/dskpkg/tmp/"
-        		sudo cp -rf "$tmpd" "~/Scripts/dskpkg/tmp/" > /dev/null/ 2>&1
+        		sudo cp -rf "$tmpd" "~/Scripts/dskpkg/tmp/" > /dev/null 2>&1
     		fi    
 
     		rm -rf $tmpd
