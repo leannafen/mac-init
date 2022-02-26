@@ -34,7 +34,7 @@
 # variables 		 #
 ##########################
 
-version="0.1.0"
+version="0.1.1"
 
 listdir="$HOME/.config/mac-init/programs"
 
@@ -121,8 +121,8 @@ DmgPkg()
         		echo "installing $name"
         		sudo installer -pkg "$tmpd"/"$name" -target / > /dev/null 2>&1
     		else
-        		echo "unknown file type. copying to ~/Scripts/dskpkg/tmp/"
-        		sudo cp -rf "$tmpd" "~/Scripts/dskpkg/tmp/" > /dev/null 2>&1
+        		echo "unknown file type. copying to desktop"
+        		sudo cp -rf "$tmpd" "~/Desktop/" > /dev/null 2>&1
     		fi    
 
     		rm -rf $tmpd
